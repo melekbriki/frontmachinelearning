@@ -1,53 +1,116 @@
-import React, { useState, useEffect } from 'react';
-import Dashboard from './pages/Dashboard';
-import PredictionPanel from './components/PredictionPanel';
-import { ping, getHistory } from './services/api';
+import React, {
+  useState,
+  useEffect,
+} from "react";
 
+import Dashboard from "./pages/Dashboard";
+import PredictionPanel from "./components/PredictionPanel";
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+import {
+  ping,
+  getHistory,
+} from "./services/api";
 
-// ── Toast notification ────────────────────────────────────────────────────────
-function Toast({ message, type, onClose }) {
+const BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  "http://localhost:8000";
+
+/* ───────────────── TOAST ───────────────── */
+
+function Toast({
+  message,
+  type,
+  onClose,
+}) {
   useEffect(() => {
     const t = setTimeout(onClose, 4000);
+
     return () => clearTimeout(t);
   }, [onClose]);
 
   const styles = {
-    success: 'bg-green-950 border-green-500/40 text-green-300',
-    error:   'bg-red-950   border-red-500/40   text-red-300',
-    info:    'bg-blue-950  border-blue-500/40  text-blue-300',
-    warning: 'bg-yellow-950 border-yellow-500/40 text-yellow-300',
+    success:
+      "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+
+    error:
+      "border-red-500/30 bg-red-500/10 text-red-300",
+
+    info:
+      "border-blue-500/30 bg-blue-500/10 text-blue-300",
+
+    warning:
+      "border-yellow-500/30 bg-yellow-500/10 text-yellow-300",
   };
 
   return (
     <div
       onClick={onClose}
-      className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium shadow-2xl cursor-pointer max-w-sm animate-[fadeIn_0.3s_ease] ${styles[type] || styles.success}`}
+      className={`fixed top-6 right-6 z-[100] px-5 py-4 rounded-2xl backdrop-blur-xl border shadow-2xl cursor-pointer animate-[fadeIn_0.3s_ease] ${styles[type]}`}
     >
-      {message}
+      <div className="flex items-center gap-3">
+        <span className="text-lg">
+          {type === "success"
+            ? "✅"
+            : type === "error"
+            ? "❌"
+            : type === "warning"
+            ? "⚠️"
+            : "ℹ️"}
+        </span>
+
+        <span className="font-medium text-sm">
+          {message}
+        </span>
+      </div>
     </div>
   );
 }
 
-// ── MLflow Button ─────────────────────────────────────────────────────────────
-function MLflowButton({ runId, onNotify }) {
-  const [loading, setLoading] = useState(false);
+/* ───────────────── MLFLOW BUTTON ───────────────── */
+
+function MLflowButton({
+  runId,
+  onNotify,
+}) {
+  const [loading, setLoading] =
+    useState(false);
 
   const openMlflow = async () => {
     if (!runId) {
-      window.open('http://localhost:5000', '_blank');
+      window.open(
+        "http://localhost:5000",
+        "_blank"
+      );
+
       return;
     }
+
     setLoading(true);
+
     try {
-      const res = await fetch(`${BASE_URL}/mlflow/run/${runId}`);
+      const res = await fetch(
+        `${BASE_URL}/mlflow/run/${runId}`
+      );
+
       if (!res.ok) throw new Error();
+
       const data = await res.json();
-      window.open(data.mlflow_url || 'http://localhost:5000', '_blank');
+
+      window.open(
+        data.mlflow_url ||
+          "http://localhost:5000",
+        "_blank"
+      );
     } catch {
-      window.open('http://localhost:5000', '_blank');
-      onNotify('🔬 Ouverture de MLflow UI — cherchez le run manuellement', 'info');
+      window.open(
+        "http://localhost:5000",
+        "_blank"
+      );
+
+      onNotify(
+        "🔬 MLflow UI ouverte",
+        "info"
+      );
     } finally {
       setLoading(false);
     }
@@ -57,149 +120,253 @@ function MLflowButton({ runId, onNotify }) {
     <button
       onClick={openMlflow}
       disabled={loading}
-      title="Voir dans MLflow UI"
-      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-orange-500/40 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20 transition-all disabled:opacity-50"
+      className="px-4 py-2 rounded-xl border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition-all text-orange-300 text-sm font-semibold flex items-center gap-2"
     >
       {loading ? (
-        <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3"/>
-          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-        </svg>
-      ) : '🔬'} MLflow
+        <div className="flex gap-1">
+          <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" />
+          <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce delay-100" />
+          <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce delay-200" />
+        </div>
+      ) : (
+        "🔬"
+      )}
+
+      MLflow
     </button>
   );
 }
 
-// ── History page ──────────────────────────────────────────────────────────────
-function HistoryPage({ onNotify }) {
-  const [runs, setRuns]    = useState([]);
-  const [loading, setLoad] = useState(true);
-  const [open, setOpen]    = useState(null);
+/* ───────────────── HISTORY ───────────────── */
+
+function HistoryPage({
+  onNotify,
+}) {
+  const [runs, setRuns] =
+    useState([]);
+
+  const [loading, setLoad] =
+    useState(true);
+
+  const [open, setOpen] =
+    useState(null);
 
   useEffect(() => {
     getHistory()
-      .then((data) => setRuns(Array.isArray(data) ? data : data?.runs || []))
-      .catch(() => onNotify('⚠️ Impossible de charger l\'historique', 'warning'))
+      .then((data) =>
+        setRuns(
+          Array.isArray(data)
+            ? data
+            : data?.runs || []
+        )
+      )
+
+      .catch(() =>
+        onNotify(
+          "⚠️ Impossible de charger l'historique",
+          "warning"
+        )
+      )
+
       .finally(() => setLoad(false));
   }, []);
 
-  const MODEL_ICON  = { logistic_regression: '⚡', random_forest: '🌲', svm: '🔷', knn: '🎯' };
-  const MODEL_NAME  = { logistic_regression: 'Logistic Regression', random_forest: 'Random Forest', svm: 'SVM', knn: 'KNN' };
-  const MODEL_COLOR = {
-    logistic_regression: 'text-blue-400 bg-blue-500/10 border-blue-500/30',
-    random_forest:       'text-green-400 bg-green-500/10 border-green-500/30',
-    svm:                 'text-purple-400 bg-purple-500/10 border-purple-500/30',
-    knn:                 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30',
+  const MODEL_ICON = {
+    logistic_regression: "⚡",
+    random_forest: "🌲",
+    svm: "🔷",
+    knn: "🎯",
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center py-20 text-gray-400 gap-3">
-      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3"/>
-        <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-      </svg>
-      Chargement de l'historique…
-    </div>
-  );
-
-  if (runs.length === 0) return (
-    <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-      <span className="text-5xl mb-4">📋</span>
-      <p className="font-semibold text-gray-400">Aucune expérience</p>
-      <p className="text-sm mt-1">Entraînez des modèles pour remplir l'historique</p>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="h-[400px] flex items-center justify-center text-gray-400">
+        <div className="flex gap-2">
+          <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" />
+          <div className="w-3 h-3 bg-emerald-400 rounded-full animate-bounce delay-100" />
+          <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce delay-200" />
+        </div>
+      </div>
+    );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
 
-      {/* ── En-tête avec bouton MLflow global ── */}
-      <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
+      {/* header */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+
         <div>
-          <h2 className="text-xl font-bold text-white">Historique des expériences</h2>
-          <p className="text-sm text-gray-500 mt-1">{runs.length} run(s) enregistré(s)</p>
+          <h1 className="text-3xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+            📜 Experiment History
+          </h1>
+
+          <p className="text-gray-400 text-sm mt-1">
+            {runs.length} saved runs
+          </p>
         </div>
 
-        {/* Bouton global : ouvre MLflow UI (liste de tous les runs) */}
         <button
-          onClick={() => window.open('http://localhost:5000', '_blank')}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-orange-500/40 bg-orange-500/10 text-orange-300 text-sm font-semibold hover:bg-orange-500/20 transition-all"
+          onClick={() =>
+            window.open(
+              "http://localhost:5000",
+              "_blank"
+            )
+          }
+          className="px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold shadow-xl hover:scale-[1.02] transition-all"
         >
-          🔬 Ouvrir MLflow UI
+          🔬 Open MLflow
         </button>
       </div>
 
-      {/* ── Liste des runs ── */}
-      {runs.map((run, i) => {
-        const colors = MODEL_COLOR[run.model] || MODEL_COLOR.random_forest;
-        const isOpen = open === i;
-        return (
-          <div key={run.id || i} className={`bg-gray-900/60 rounded-2xl border transition-all ${isOpen ? 'border-white/15' : 'border-white/8'}`}>
+      {/* empty */}
+      {runs.length === 0 && (
+        <div className="h-[400px] flex flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl bg-white/[0.02]">
+          <div className="text-6xl mb-4">
+            🤖
+          </div>
 
-            {/* Row principale */}
+          <p className="text-gray-400">
+            No experiments yet
+          </p>
+        </div>
+      )}
+
+      {/* runs */}
+      {runs.map((run, i) => {
+        const isOpen = open === i;
+
+        return (
+          <div
+            key={i}
+            className="bg-white/5 border border-white/10 rounded-3xl backdrop-blur-xl overflow-hidden hover:border-blue-500/30 transition-all"
+          >
+            {/* top */}
             <div
-              onClick={() => setOpen(isOpen ? null : i)}
-              className="flex items-center gap-4 p-4 cursor-pointer flex-wrap"
+              onClick={() =>
+                setOpen(
+                  isOpen ? null : i
+                )
+              }
+              className="p-5 flex items-center justify-between cursor-pointer"
             >
-              <span className="text-2xl">{MODEL_ICON[run.model] || '🤖'}</span>
-              <div className="flex-1 min-w-32">
-                <p className="font-semibold text-white text-sm">{MODEL_NAME[run.model] || run.model}</p>
-                <p className="text-xs text-gray-500">{run.date || '—'}</p>
+              <div className="flex items-center gap-4">
+
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20 flex items-center justify-center text-2xl border border-white/10">
+                  {MODEL_ICON[
+                    run.model
+                  ] || "🤖"}
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-lg">
+                    {run.model}
+                  </h3>
+
+                  <p className="text-sm text-gray-400">
+                    {run.date || "—"}
+                  </p>
+                </div>
               </div>
-              <div className="flex gap-5">
-                {[['Acc', run.accuracy], ['F1', run.f1], ['AUC', run.roc_auc]].map(([label, val]) =>
-                  val != null ? (
-                    <div key={label} className="text-center">
-                      <p className={`text-base font-black font-mono ${colors.split(' ')[0]}`}>{val.toFixed(1)}%</p>
-                      <p className="text-xs text-gray-500">{label}</p>
+
+              <div className="flex items-center gap-8">
+
+                {[
+                  [
+                    "Accuracy",
+                    run.accuracy,
+                  ],
+
+                  ["F1", run.f1],
+
+                  [
+                    "ROC",
+                    run.roc_auc,
+                  ],
+                ].map(
+                  ([label, val]) => (
+                    <div
+                      key={label}
+                      className="text-center"
+                    >
+                      <p className="text-2xl font-black text-white">
+                        {val?.toFixed
+                          ? val.toFixed(
+                              1
+                            )
+                          : "--"}
+                        %
+                      </p>
+
+                      <p className="text-xs text-gray-500">
+                        {label}
+                      </p>
                     </div>
-                  ) : null
+                  )
                 )}
+
+                <div className="text-gray-500 text-sm">
+                  {isOpen
+                    ? "▲"
+                    : "▼"}
+                </div>
               </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full border font-mono ${colors}`}>
-                {(run.id || `run-${i + 1}`).slice(0, 8)}
-              </span>
-              <span className="text-gray-600 text-sm">{isOpen ? '▲' : '▼'}</span>
             </div>
 
-            {/* Panneau déroulant */}
+            {/* dropdown */}
             {isOpen && (
-              <div className="border-t border-white/8 p-4 bg-black/20 rounded-b-2xl space-y-4">
+              <div className="border-t border-white/10 p-5 bg-black/20 space-y-5">
 
-                {/* Hyperparamètres */}
+                {/* params */}
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Hyperparamètres</p>
+                  <p className="text-sm text-gray-400 mb-3">
+                    Hyperparameters
+                  </p>
+
                   <div className="flex flex-wrap gap-2">
-                    {Object.entries(run.params || {}).map(([k, v]) => (
-                      <span key={k} className="text-xs px-2 py-1 bg-white/5 rounded-lg text-gray-400">
-                        <span className="text-gray-600">{k}: </span>
-                        <span className={`font-mono ${colors.split(' ')[0]}`}>{String(v)}</span>
-                      </span>
-                    ))}
+
+                    {Object.entries(
+                      run.params || {}
+                    ).map(
+                      ([k, v]) => (
+                        <div
+                          key={k}
+                          className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm"
+                        >
+                          <span className="text-gray-500">
+                            {k}:
+                          </span>{" "}
+
+                          <span className="text-blue-400 font-mono">
+                            {String(v)}
+                          </span>
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex flex-wrap gap-2 pt-1">
+                {/* actions */}
+                <div className="flex gap-3 flex-wrap">
 
-                  {/* ── Bouton MLflow par run ── */}
-                  <MLflowButton runId={run.id} onNotify={onNotify} />
+                  <MLflowButton
+                    runId={run.id}
+                    onNotify={
+                      onNotify
+                    }
+                  />
 
-                  {/* Rollback */}
                   <button
-                    onClick={() => onNotify('🔄 Rollback — implémentez POST /rollback sur le backend', 'info')}
-                    className={`px-4 py-1.5 text-xs font-semibold rounded-lg border transition-all ${colors}`}
+                    onClick={() =>
+                      onNotify(
+                        "🔄 Rollback feature",
+                        "info"
+                      )
+                    }
+                    className="px-4 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-all text-sm font-semibold"
                   >
-                    🔄 Rollback vers cette version
+                    🔄 Rollback
                   </button>
                 </div>
-
-                {/* Lien MLflow run ID si disponible */}
-                {run.mlflow_run_id && (
-                  <p className="text-xs text-gray-600 font-mono">
-                    MLflow run ID : <span className="text-orange-400/70">{run.mlflow_run_id}</span>
-                  </p>
-                )}
               </div>
             )}
           </div>
@@ -209,101 +376,195 @@ function HistoryPage({ onNotify }) {
   );
 }
 
-// ── App root ──────────────────────────────────────────────────────────────────
+/* ───────────────── APP ───────────────── */
+
 const NAV = [
-  { id: 'dashboard', label: 'Dashboard',  icon: '⚡' },
-  { id: 'predict',   label: 'Prédiction', icon: '🎯' },
-  { id: 'history',   label: 'Historique', icon: '📋' },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: "⚡",
+  },
+
+  {
+    id: "predict",
+    label: "Prediction",
+    icon: "🎯",
+  },
+
+  {
+    id: "history",
+    label: "History",
+    icon: "📜",
+  },
 ];
 
 export default function App() {
-  const [page, setPage]           = useState('dashboard');
-  const [allResults, setResults]  = useState({});
-  const [toast, setToast]         = useState(null);
-  const [apiStatus, setApiStatus] = useState('checking');
+  const [page, setPage] =
+    useState("dashboard");
+
+  const [allResults, setResults] =
+    useState({});
+
+  const [toast, setToast] =
+    useState(null);
+
+  const [apiStatus, setApiStatus] =
+    useState("checking");
 
   useEffect(() => {
     ping()
-      .then(() => setApiStatus('ok'))
-      .catch(() => setApiStatus('error'));
+      .then(() =>
+        setApiStatus("ok")
+      )
+      .catch(() =>
+        setApiStatus("error")
+      );
   }, []);
 
-  const notify = (msg, type = 'success') => setToast({ msg, type });
+  const notify = (
+    msg,
+    type = "success"
+  ) =>
+    setToast({
+      msg,
+      type,
+    });
 
-  const handleTrainComplete = (results) =>
-    setResults((prev) => ({ ...prev, ...results }));
+  const handleTrainComplete = (
+    results
+  ) =>
+    setResults((prev) => ({
+      ...prev,
+      ...results,
+    }));
 
   return (
-    <div className="min-h-screen bg-[#080a0f] text-gray-100" style={{ fontFamily: "'Outfit', system-ui, sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-        @keyframes fadeIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
-      `}</style>
+    <div className="min-h-screen bg-gradient-to-br from-[#050816] via-[#0b1120] to-[#111827] text-white overflow-hidden relative">
 
-      {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
+      {/* bg effects */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/20 blur-[150px] rounded-full" />
 
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-white/8 backdrop-blur-md bg-[#080a0f]/90 px-6 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base" style={{ background: 'linear-gradient(135deg,#1d4ed8,#7c3aed)' }}>
-            🏦
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/20 blur-[150px] rounded-full" />
+
+      {/* grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+      {/* toast */}
+      {toast && (
+        <Toast
+          message={toast.msg}
+          type={toast.type}
+          onClose={() =>
+            setToast(null)
+          }
+        />
+      )}
+
+      {/* navbar */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/5 border-b border-white/10">
+
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+
+          {/* logo */}
+          <div>
+            <h1 className="text-2xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+              CreditGuard
+            </h1>
+
+            <p className="text-xs text-gray-400">
+              Platform
+            </p>
           </div>
-          <span className="font-extrabold text-base tracking-tight">CreditGuard</span>
-          <span className="text-xs text-gray-600 uppercase tracking-widest hidden sm:block">ML Platform</span>
-        </div>
 
-        <nav className="flex gap-1">
-          {NAV.map(({ id, label, icon }) => (
-            <button
-              key={id}
-              onClick={() => setPage(id)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-all border
-                ${page === id
-                  ? 'bg-blue-500/15 border-blue-500/35 text-blue-400'
-                  : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}`}
+          {/* nav */}
+          <nav className="flex items-center gap-2">
+
+            {NAV.map((item) => (
+              <button
+                key={item.id}
+                onClick={() =>
+                  setPage(item.id)
+                }
+                className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300
+                ${
+                  page === item.id
+                    ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg shadow-blue-500/20 scale-105"
+                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                <span className="mr-2">
+                  {item.icon}
+                </span>
+
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* api */}
+          <div className="flex items-center gap-3">
+
+            <div
+              className={`w-3 h-3 rounded-full ${
+                apiStatus === "ok"
+                  ? "bg-emerald-400 animate-pulse"
+                  : apiStatus ===
+                    "error"
+                  ? "bg-red-500"
+                  : "bg-yellow-400"
+              }`}
+            />
+
+            <span
+              className={`text-sm font-semibold ${
+                apiStatus === "ok"
+                  ? "text-emerald-400"
+                  : apiStatus ===
+                    "error"
+                  ? "text-red-400"
+                  : "text-yellow-400"
+              }`}
             >
-              {icon} {label}
-            </button>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-2 text-xs">
-          <span className={`w-2 h-2 rounded-full ${
-            apiStatus === 'ok'    ? 'bg-green-500 animate-pulse' :
-            apiStatus === 'error' ? 'bg-red-500' : 'bg-yellow-500'
-          }`} />
-          <span className={
-            apiStatus === 'ok'    ? 'text-green-400' :
-            apiStatus === 'error' ? 'text-red-400' : 'text-yellow-400'
-          }>
-            {apiStatus === 'ok' ? 'API Connectée' : apiStatus === 'error' ? 'API Hors ligne' : 'Connexion…'}
-          </span>
+              {apiStatus === "ok"
+                ? "API Online"
+                : apiStatus ===
+                  "error"
+                ? "API Offline"
+                : "Connecting..."}
+            </span>
+          </div>
         </div>
       </header>
 
-      {/* ── Page ────────────────────────────────────────────────────────── */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        {page === 'dashboard' && (
+      {/* pages */}
+      <main className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+
+        {page ===
+          "dashboard" && (
           <Dashboard
-            allResults={allResults}
-            onTrainComplete={handleTrainComplete}
+            allResults={
+              allResults
+            }
+            onTrainComplete={
+              handleTrainComplete
+            }
             onNotify={notify}
           />
         )}
 
-        {page === 'predict' && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-gray-900/60 border border-white/8 rounded-2xl p-6">
-              <PredictionPanel trainedResults={allResults} onNotify={notify} />
-            </div>
-          </div>
+        {page === "predict" && (
+          <PredictionPanel
+            trainedResults={
+              allResults
+            }
+            onNotify={notify}
+          />
         )}
 
-        {page === 'history' && (
-          <HistoryPage onNotify={notify} />
+        {page === "history" && (
+          <HistoryPage
+            onNotify={notify}
+          />
         )}
       </main>
     </div>

@@ -2,16 +2,176 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#080a0f" />
-    <meta name="description" content="CreditGuard — German Credit Risk ML Platform" />
-    <title>CreditGuard — ML Platform</title>
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+
+    <meta
+      name="theme-color"
+      content="#050816"
+    />
+
+    <meta
+      name="description"
+      content="CreditGuard AI — Modern Machine Learning Risk Analysis Platform"
+    />
+
+    <meta
+      name="keywords"
+      content="AI, Machine Learning, Dashboard, Credit Risk, Random Forest, MLflow, Prediction Platform"
+    />
+
+    <meta
+      name="author"
+      content="CreditGuard AI"
+    />
+
+    <!-- Google Font -->
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>
+      CreditGuard AI — ML Dashboard
+    </title>
+
     <style>
-      body { margin: 0; background: #5b77be; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body,
+      #root {
+        width: 100%;
+        min-height: 100%;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(59, 130, 246, 0.25),
+            transparent 35%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(16, 185, 129, 0.2),
+            transparent 35%
+          ),
+          linear-gradient(
+            135deg,
+            #050816 0%,
+            #0b1120 40%,
+            #111827 100%
+          );
+
+        color: white;
+
+        overflow-x: hidden;
+
+        background-attachment: fixed;
+      }
+
+      /* futuristic grid */
+      body::before {
+        content: "";
+
+        position: fixed;
+        inset: 0;
+
+        background-image:
+          linear-gradient(
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px
+          );
+
+        background-size: 40px 40px;
+
+        pointer-events: none;
+
+        z-index: -1;
+      }
+
+      /* smooth scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #0b1120;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          to bottom,
+          #3b82f6,
+          #10b981
+        );
+
+        border-radius: 999px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        opacity: 0.8;
+      }
+
+      /* selection */
+      ::selection {
+        background: rgba(59, 130, 246, 0.4);
+        color: white;
+      }
+
+      noscript {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        height: 100vh;
+
+        font-size: 18px;
+
+        background: #050816;
+
+        color: white;
+      }
     </style>
   </head>
+
   <body>
-    <noscript>Vous devez activer JavaScript pour utiliser cette application.</noscript>
+    <noscript>
+      Vous devez activer JavaScript
+      pour utiliser cette application.
+    </noscript>
+
     <div id="root"></div>
   </body>
 </html>
