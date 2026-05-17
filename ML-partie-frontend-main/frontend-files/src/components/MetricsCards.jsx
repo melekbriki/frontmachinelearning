@@ -88,8 +88,10 @@ const MODEL_COLORS = {
   random_forest:       '#10b981',
   svm:                 '#8b5cf6',
   knn:                 '#f59e0b',
+  adaboost:            '#f97316',  // ← orange
+  xgboost:             '#ef4444',  // ← rouge
 };
-const MODEL_SHORT = { logistic_regression: 'LR', random_forest: 'RF', svm: 'SVM', knn: 'KNN' };
+const MODEL_SHORT = { logistic_regression: 'LR', random_forest: 'RF', svm: 'SVM', knn: 'KNN',adaboost: 'ADA', xgboost: 'XGB',};
 
 function ComparisonChart({ results }) {
   const models = Object.keys(results);

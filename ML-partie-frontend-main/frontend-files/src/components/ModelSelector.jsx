@@ -5,6 +5,8 @@ const MODELS = [
   { id: 'random_forest',       name: 'Random Forest',       icon: '🌲', color: 'green',  desc: 'Ensemble d\'arbres de décision. Robuste et performant sur données tabulaires.' },
   { id: 'svm',                 name: 'SVM',                 icon: '🔷', color: 'purple', desc: 'Trouve l\'hyperplan optimal pour séparer les classes.' },
   { id: 'knn',                 name: 'KNN',                 icon: '🎯', color: 'yellow', desc: 'Classe selon les k voisins les plus proches. Simple et interprétable.' },
+  { id: 'adaboost',            name: 'AdaBoost',            icon: '🚀', color: 'orange', desc: 'Boosting adaptatif. Combine des modèles faibles en un modèle fort.' },
+  { id: 'xgboost',             name: 'XGBoost',             icon: '⚡', color: 'red',    desc: 'Gradient boosting optimisé. Très performant sur données tabulaires.' },
 ];
 
 const COLOR_MAP = {
@@ -12,6 +14,8 @@ const COLOR_MAP = {
   green:  { border: 'border-green-500',  bg: 'bg-green-500/10',  text: 'text-green-400',  badge: 'bg-green-500/20 text-green-300' },
   purple: { border: 'border-purple-500', bg: 'bg-purple-500/10', text: 'text-purple-400', badge: 'bg-purple-500/20 text-purple-300' },
   yellow: { border: 'border-yellow-500', bg: 'bg-yellow-500/10', text: 'text-yellow-400', badge: 'bg-yellow-500/20 text-yellow-300' },
+  orange: { border: 'border-orange-500', bg: 'bg-orange-500/10', text: 'text-orange-400', badge: 'bg-orange-500/20 text-orange-300' },
+  red:    { border: 'border-red-500',    bg: 'bg-red-500/10',    text: 'text-red-400',    badge: 'bg-red-500/20 text-red-300' },
 };
 
 export default function ModelSelector({ selected, onChange, compareMode, onCompareModeChange }) {

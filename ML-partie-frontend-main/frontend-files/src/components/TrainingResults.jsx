@@ -8,6 +8,8 @@ const MODEL_COLORS = {
   random_forest:       { text: 'text-green-400',  border: 'border-green-500/40',  bg: 'bg-green-500/10'  },
   svm:                 { text: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-purple-500/10' },
   knn:                 { text: 'text-yellow-400', border: 'border-yellow-500/40', bg: 'bg-yellow-500/10' },
+  adaboost:            { text: 'text-orange-400', border: 'border-orange-500/40', bg: 'bg-orange-500/10' }, // ← nouveau
+  xgboost:             { text: 'text-red-400',    border: 'border-red-500/40',    bg: 'bg-red-500/10'    }, // ← nouveau
 };
 
 export default function TrainingResults({ results, onNotify }) {

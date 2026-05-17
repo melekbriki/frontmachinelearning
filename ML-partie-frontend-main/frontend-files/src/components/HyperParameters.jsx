@@ -26,6 +26,19 @@ const MODEL_PARAMS = {
     { key: 'weights',     label: 'Poids',            type: 'select',  default: 'uniform', options: ['uniform', 'distance'] },
     { key: 'use_smote',   label: 'Utiliser SMOTE',   type: 'boolean', default: false },
   ],
+  adaboost: [
+    { key: 'test_size',     label: 'Test Size',        type: 'number',  default: 0.2,  min: 0.1, max: 0.4,  step: 0.05 },
+    { key: 'n_estimators',  label: "Nbre d'estimateurs", type: 'number', default: 50,   min: 10,  max: 500,  step: 10   },
+    { key: 'learning_rate', label: 'Learning Rate',    type: 'number',  default: 1.0,  min: 0.01, max: 2.0, step: 0.1  },
+    { key: 'use_smote',     label: 'Utiliser SMOTE',   type: 'boolean', default: false },
+  ],
+  xgboost: [
+    { key: 'test_size',     label: 'Test Size',        type: 'number',  default: 0.2,  min: 0.1, max: 0.4,  step: 0.05 },
+    { key: 'n_estimators',  label: "Nbre d'estimateurs", type: 'number', default: 100,  min: 10,  max: 500,  step: 10   },
+    { key: 'max_depth',     label: 'Profondeur max',   type: 'number',  default: 5,    min: 1,   max: 20,   step: 1    },
+    { key: 'learning_rate', label: 'Learning Rate',    type: 'number',  default: 0.1,  min: 0.01, max: 1.0, step: 0.01 },
+    { key: 'use_smote',     label: 'Utiliser SMOTE',   type: 'boolean', default: false },
+  ],
 };
 
 const TUNE_METHODS = ['GridSearch', 'RandomSearch', 'Optuna'];

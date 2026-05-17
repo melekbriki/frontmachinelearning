@@ -176,6 +176,8 @@ function HistoryPage({
     random_forest: "🌲",
     svm: "🔷",
     knn: "🎯",
+    adaboost:            '🚀',  // ← nouveau
+    xgboost:             '⚡',  // ← nouveau
   };
 
   if (loading)
